@@ -1,0 +1,8 @@
+*
+!Dockerfile
+!package.json
+!package-lock.json
+!build.sh
+!export.mjs
+!vite.config.mjs
+!tsconfig.json

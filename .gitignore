@@ -1,0 +1,19 @@
+# Secrets and local configuration, including nested frontend/backend directories
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Build output and developer state
+**/node_modules/
+**/target/
+**/dist/
+**/.idea/
+.DS_Store
+*.log
+
+# Local backups and archives
+frontend-ESKİ/
+frontend-ESKİ/
+frontend-ESKI/
+*.zip
