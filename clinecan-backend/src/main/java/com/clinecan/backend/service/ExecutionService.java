@@ -138,6 +138,37 @@ public class ExecutionService {
                     e.emit("PREVIEW", "COMPLETED", "Preview artifact ready. Isolated visual preview and compiled ZIP available.");
                     e.finish("COMPLETED", null); return;
                 }
+                // Hosted DEMO environments such as Railway do not expose a Docker daemon.
+                // Keep the real Docker sandbox unchanged locally; only convert this known
+                // infrastructure limitation into an explicit hosted-demo completion.
+                if ("SANDBOX_UNAVAILABLE".equals(outcome.build().failureCategory())
+                        && "DEMO".equals(e.mode)
+                        && "true".equalsIgnoreCase(System.getenv("CLINECAN_HOSTED_DEMO"))) {
+                    e.emit(stage, "COMPLETED",
+                            "Hosted Demo: Docker sandbox bu ortamda kullanılamıyor; kaynak doğrulaması tamamlandı. Gerçek izole Docker build yerel geliştirme ortamında kullanılabilir.");
+                    synchronized(e) {
+                        if (e.terminal()) return;
+                        e.result = new AgentResponse(
+                                generated.projectName(),
+                                prompt,
+                                "COMPLETED",
+                                generated.steps(),
+                                List.copyOf(files),
+                                generated.generationMode(),
+                                generated.summary(),
+                                generated.specification(),
+                                generated.plan(),
+                                generated.validation(),
+                                generated.execution(),
+                                null
+                        );
+                    }
+                    e.emit("PREVIEW", "COMPLETED",
+                            "Hosted Demo tamamlandı. Bu çalıştırmada Docker build/çalıştırılabilir preview üretilmedi.");
+                    e.finish("COMPLETED", null);
+                    return;
+                }
+
                 e.emit(stage, "FAILED", "Build failed: " + outcome.build().failureCategory());
                 if ("BUILD_TIMEOUT".equals(outcome.build().failureCategory())) { e.finish("TIMED_OUT", new AgentError("BUILD_TIMEOUT", "İzole derleme zaman aşımına uğradı.", true)); return; }
                 if (!"COMPILATION".equals(outcome.build().failureCategory()) || !"LLM".equals(e.mode) || attempt == settings.repairAttempts()) {
