@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 @RequestMapping("/api/agent/executions")
-@CrossOrigin(origins = "${clinecan.allowed-origins:http://localhost:5173,http://localhost:5174}")
+@CrossOrigin(origins = "${clinecan.allowed-origins:http://localhost:5173,http://localhost:5174,https://clinecan.vercel.app}")
 public class ExecutionController {
     private final ExecutionService service;
     public ExecutionController(ExecutionService service) { this.service = service; }
