@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/agent")
-@CrossOrigin(origins = "${clinecan.allowed-origins:http://localhost:5173,http://localhost:5174,https://clinecan.vercel.app}")
 public class AgentController {
 
     private final AgentService agentService;
