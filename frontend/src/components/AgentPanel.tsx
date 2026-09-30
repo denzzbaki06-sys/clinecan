@@ -74,6 +74,14 @@ export function AgentPanel({
   steps?: AgentStep[];
   build?: {success: boolean} | null;
 }) {
+  const displayedSteps = steps ?? result?.steps ?? initial;
+  const hostedDemo = displayedSteps.some(
+    (step) =>
+      step.name === "BUILD" &&
+      step.status === "COMPLETED" &&
+      step.message.startsWith("Hosted Demo:"),
+  );
+
   return (
     <section className="agent-panel glass">
       <header>
@@ -109,15 +117,21 @@ export function AgentPanel({
         </p>
       )}
       <ol>
-        {(steps ?? result?.steps ?? initial).map((step, i) => (
+        {displayedSteps.map((step, i) => (
           <AgentStepItem key={`${step.name}-${i}`} step={step} index={i} />
         ))}
       </ol>
       <footer>
         <span>◇</span>{" "}
-        {build?.success ? "Can halletti. ☕️ İzole derleme başarılı." : build ? "İzole derleme başarısız." : result
-          ? "Yapısal doğrulama • derleme sonucu yok"
-          : "Fikrin sende. İlk adım Can’da."}
+        {build?.success
+          ? "Can halletti. ☕️ İzole derleme başarılı."
+          : hostedDemo
+            ? "Hosted Demo doğrulaması tamamlandı. ☕️"
+            : build
+              ? "İzole derleme başarısız."
+              : result
+                ? "Yapısal doğrulama • derleme sonucu yok"
+                : "Fikrin sende. İlk adım Can’da."}
         <span>POWERED BY CLINECAN</span>
       </footer>
     </section>
