@@ -6,7 +6,7 @@ import { suggestions } from "./types/suggestions";
 import { PromptComposer } from "./components/PromptComposer";
 import { AgentPanel } from "./components/AgentPanel";
 import { DeveloperPanel } from "./components/DeveloperPanel";
-import { API_URL, getGenerationMode } from "./services/agentApi";
+import { getGenerationMode } from "./services/agentApi";
 import type {
   AgentResponse,
   TerminalEvent,
@@ -200,17 +200,15 @@ function App() {
                   </>
                 ) : (
                   <>
-                    <p>Yerel geliştirme bağlantısı</p>
-                    <code>{API_URL}</code>
-                    <p>
-                      Özel sunucu için VITE_AGENT_API_URL ortam değişkenini
-                      kullan.
-                    </p>
-                    <p>
-                      {modeLabel(mode, result)}. DEMO deterministik örnekler
-                      üretir. LLM modu sunucu tarafında yapılandırılır; bağlantı
-                      ilk başarılı üretimde doğrulanır.
-                    </p>
+                    <p><strong>Bağlantı Durumu</strong></p>
+                    <p>● Clinecan Backend · Bağlı</p>
+
+                    <p><strong>Çalışma Modu</strong></p>
+                    <p>{modeLabel(mode, result)}</p>
+                    <p>Güvenli ve deterministik proje üretimi aktif.</p>
+
+                    <p><strong>Altyapı</strong></p>
+                    <p>Railway Cloud</p>
                   </>
                 )}
               </section>
