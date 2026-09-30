@@ -127,6 +127,13 @@ export function PreviewPanel({ result, execution }: { result: AgentResponse | nu
   const [refreshKey, setRefreshKey] = useState(0);
   const widths = { desktop: "100%", tablet: "768px", mobile: "390px" } as const;
 
+  // Hosted DEMO completes generation/validation without a Docker runtime.
+  // This is an expected deployment mode, not a project build failure.
+  const hostedDemo =
+    result?.generationMode === "DEMO" &&
+    execution?.status === "COMPLETED" &&
+    execution?.build?.success === false;
+
   if (!result) return (
     <div className="preview-panel">
       <div className="editor-empty"><span>▧</span><h3>Fikrine bir pencere aç.</h3><p>Başarılı derlemeden sonra çalışan uygulama burada açılacak.</p></div>
@@ -136,7 +143,9 @@ export function PreviewPanel({ result, execution }: { result: AgentResponse | nu
   return (
     <div className="preview-panel">
       <div className="preview-toolbar">
-        <div className="preview-address">◇ &nbsp; {livePreview ? "İzole canlı önizleme" : "Önizleme bekleniyor"}</div>
+        <div className="preview-address">
+          ◇ &nbsp; {livePreview ? "İzole canlı önizleme" : hostedDemo ? "Hosted Demo hazır" : "Önizleme bekleniyor"}
+        </div>
         <div className="preview-controls" aria-label="Önizleme boyutu">
           {(["desktop", "tablet", "mobile"] as const).map(size => (
             <button key={size} className={viewport === size ? "active" : ""} onClick={() => setViewport(size)}>
@@ -160,16 +169,36 @@ export function PreviewPanel({ result, execution }: { result: AgentResponse | nu
         </div>
       ) : (
         <div className="preview-card">
-          <small>{execution?.build?.success ? "PREVIEW HAZIRLANIYOR" : "BUILD REQUIRED"}</small>
+          <small>
+            {hostedDemo
+              ? "HOSTED DEMO"
+              : execution?.build?.success
+                ? "PREVIEW HAZIRLANIYOR"
+                : "BUILD REQUIRED"}
+          </small>
           <h2>{preview?.title}</h2>
-          <p>{execution?.build?.success ? "Derleme başarılı ancak çalıştırılabilir preview URL'si henüz hazır değil." : "Çalışan önizleme yalnızca başarılı Docker derlemesinden sonra açılır."}</p>
+          <p>
+            {hostedDemo
+              ? "Kaynak üretimi ve doğrulama başarıyla tamamlandı. Canlı Docker önizlemesi yerel geliştirme ortamında kullanılabilir."
+              : execution?.build?.success
+                ? "Derleme başarılı ancak çalıştırılabilir preview URL'si henüz hazır değil."
+                : "Çalışan önizleme yalnızca başarılı Docker derlemesinden sonra açılır."}
+          </p>
           <span>{result.files.length} dosya oluşturuldu</span>
         </div>
       )}
 
       <div className="preview-actions">
         {download && <a className="preview-download" href={download} download="clinecan-build.zip">Projeyi İndir (.zip)</a>}
-        {execution?.build && <span className={execution.build.success ? "preview-success" : "preview-failure"}>{execution.build.success ? `✓ Docker build başarılı · ${execution.repairAttempts} onarım` : "Derleme başarısız · executable preview yok"}</span>}
+        {execution?.build && (
+          <span className={execution.build.success || hostedDemo ? "preview-success" : "preview-failure"}>
+            {execution.build.success
+              ? `✓ Docker build başarılı · ${execution.repairAttempts} onarım`
+              : hostedDemo
+                ? "✓ Hosted Demo tamamlandı · kaynak doğrulaması başarılı"
+                : "Derleme başarısız · executable preview yok"}
+          </span>
+        )}
       </div>
       <p className="preview-note">Preview ayrı, sandboxed bir iframe içinde çalışır. <code>allow-same-origin</code> verilmez; Clinecan uygulamasının oturumuna ve JavaScript bağlamına erişemez.</p>
     </div>
